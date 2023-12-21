@@ -3,6 +3,7 @@ package com.zyx.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.zyx.gulimall.member.feign.CouponFeignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +29,8 @@ import com.zyx.gulimall.common.utils.R;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private CouponFeignService couponFeignService;
 
     /**
      * 列表
@@ -75,9 +78,18 @@ public class MemberController {
      */
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] ids){
-		memberService.removeByIds(Arrays.asList(ids));
+        memberService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
+    }
+
+    @RequestMapping("/coupons")
+    public R test(){
+        MemberEntity memberEntity=new MemberEntity();
+        memberEntity.setNickname("zhangsan");
+        R memberCoupons = couponFeignService.memberCoupons();
+
+        return memberCoupons.put("member",memberEntity).put("coupons",memberCoupons.get("coupons"));
     }
 
 }
