@@ -80,4 +80,11 @@ public class CouponController {
         return R.ok();
     }
 
+    @RequestMapping("/member/list")
+    public R memberCoupons(){
+        CouponEntity couponEntity = new CouponEntity();
+        couponEntity.setCouponName("discount 20%");
+        return R.ok().put("coupons",Arrays.asList(couponEntity));
+    }
+
 }
