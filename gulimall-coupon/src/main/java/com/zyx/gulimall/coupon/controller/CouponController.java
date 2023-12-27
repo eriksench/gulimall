@@ -89,14 +89,4 @@ public class CouponController {
         couponEntity.setCouponName("discount 20%");
         return R.ok().put("coupons",Arrays.asList(couponEntity));
     }
-
-    @Value("${coupon.user.name}")
-    private String name;
-    @Value("${coupon.user.age}")
-    private Integer age;
-
-    @RequestMapping("/test")
-    public R getConfigInfo(){
-        return R.ok().put("name",name).put("age",age);
-    }
 }
