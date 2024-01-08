@@ -2,8 +2,10 @@ package com.zyx.gulimall.product.service.impl;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -37,9 +39,28 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public List<CategoryEntity> listWithTree() {
         List<CategoryEntity> entities = baseMapper.selectList(null);
         List<CategoryEntity> level1Menus = entities.stream().filter((categoryEntity -> categoryEntity.getParentCid() == 0))
-                .map(menu)
+                .map((menu) -> {
+                    menu.setChildren(getChildren(menu, entities));
+                    return menu;
+                })
+                .sorted(Comparator.comparingInt(menu -> (menu.getSort() == null ? 0 : menu.getSort())))
                 .collect(Collectors.toList());
         return entities;
+    }
+
+    private List<CategoryEntity> getChildren(CategoryEntity root, List<CategoryEntity> all) {
+        List<CategoryEntity> children = all.stream()
+                // 过滤
+                .filter(categoryEntity -> categoryEntity.getParentCid() == root.getCatId())
+                // 递归查子菜单
+                .map(categoryEntity -> {
+                    categoryEntity.setChildren(getChildren(categoryEntity, all));
+                    return categoryEntity;
+                })
+                // 菜单排序
+                .sorted(Comparator.comparingInt(menu -> (menu.getSort() == null ? 0 : menu.getSort())))
+                .collect(Collectors.toList());
+        return children;
     }
 
 }
